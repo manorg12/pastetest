@@ -1,0 +1,213 @@
+{%- capture section_settings -%}
+{
+  "type": {{ settings.cart_type | json }},
+  "itemCount": {{ cart.item_count }},
+  "drawer": true,
+  "hasShippingEstimator": false
+}
+{%- endcapture -%}
+
+<div id="sidebar-cart" class="Drawer Drawer--fromRight" aria-hidden="true" data-section-id="cart" data-section-type="cart" data-section-settings='{{ section_settings }}'>
+  <div class="Drawer__Header Drawer__Header--bordered Drawer__Container">
+      <span class="Drawer__Title Heading u-h4">{{ 'cart.general.title' | t }}</span>
+
+      <button class="Drawer__Close Icon-Wrapper--clickable" data-action="close-drawer" data-drawer-id="sidebar-cart" aria-label="{{ 'header.navigation.close_cart' | t }}">
+        {%- include 'icon' with 'close' -%}
+      </button>
+  </div>
+
+  <form class="Cart Drawer__Content" action="/cart" method="POST" novalidate>
+    <div class="Drawer__Main" data-scrollable>
+      {%- if settings.cart_show_free_shipping_threshold -%}
+        {%- assign threshold_in_cents = settings.cart_free_shipping_threshold | times: 100 -%}
+
+        <div class="Cart__ShippingNotice Text--subdued">
+          <div class="Drawer__Container">
+            {%- if cart.total_price >= threshold_in_cents -%}
+              <p>{{ 'cart.general.free_shipping' | t }}</p>
+            {%- else -%}
+              {%- capture remaining_amount -%}<span data-money-convertible>{{ cart.total_price | minus: threshold_in_cents | abs | money_without_trailing_zeros }}</span>{%- endcapture -%}
+              <p>{{ 'cart.general.free_shipping_remaining_html' | t: remaining_amount: remaining_amount }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if cart.item_count == 0 -%}
+        <p class="Cart__Empty Heading u-h5">{{ 'cart.general.empty' | t }}</p>
+      {%- else -%}
+        <div class="Drawer__Container">
+          <input type="hidden" name="attributes[collection_mobile_items_per_row]" value="">
+          <input type="hidden" name="attributes[collection_desktop_items_per_row]" value="">
+
+          {% include 'cart-items' %}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- unless cart.item_count == 0 -%}
+      <div class="Drawer__Footer" data-drawer-animated-bottom>
+        {%- capture shipping_and_taxes_notice -%}{{ 'cart.general.shipping_and_taxes_notice' | t }}{%- endcapture -%}
+
+        {%- if settings.cart_enable_notes or shipping_and_taxes_notices != blank -%}
+          {%- if settings.cart_enable_notes -%}
+            {%- if cart.note == blank -%}
+              <button type="button" class="Cart__NoteButton" data-action="toggle-cart-note">+ {{ 'cart.general.add_note' | t }}</button>
+            {%- else -%}
+              <button type="button" class="Cart__NoteButton" data-action="toggle-cart-note">+ {{ 'cart.general.edit_note' | t }}</button>
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if shipping_and_taxes_notice != blank -%}
+            <span class="Cart__Taxes Text--subdued">{{ shipping_and_taxes_notice }}</span>
+          {%- endif -%}
+        {%- endif -%}
+        
+        
+        
+<div class="termsDiv" style="display:flex;margin-top:10px;align-items:center;justify-content:center;">
+  <div>
+    <input class="styled-checkbox" id="agreeTerms" type="checkbox" value="value1">
+    <label for="agreeTerms"> 
+    </label>
+  </div>
+  <div style="font-size:13px;">
+    Es gelten die <a href="/pages/terms-of-service" style="text-decoration:underline;">AGB</a> und die <a href="/pages/privacy-policy" style="text-decoration:underline;">Datenschutzerklärung</a><span style="display:none;"> und die <a href="/pages/delivery-returns/" style="text-decoration:underline;">Widerrufsbelehrung</a></span></div>
+</div>
+<style>
+  .styled-checkbox {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .styled-checkbox+label {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .styled-checkbox+label:before {
+    content: '';
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: text-top;
+    width: 25px;
+    height: 25px;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .styled-checkbox:hover+label:before {
+    background: #000;
+  }
+
+  .styled-checkbox:focus+label:before {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .styled-checkbox:checked+label:before {
+    background: #000;
+  }
+
+  .styled-checkbox:disabled+label {
+    color: #b8b8b8;
+    cursor: auto;
+  }
+
+  .styled-checkbox:disabled+label:before {
+    box-shadow: none;
+    background: #ddd;
+  }
+
+  .styled-checkbox:checked+label:after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 11px;
+    background: white;
+    width: 4px;
+    height: 4px;
+    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .Form__Checkbox~svg {
+    position: relative;
+    top: -1px;
+    left: 17px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .Form__Checkbox~label::before {
+    border: 1px solid #000;
+  }
+    .Button--disabled {
+    border-color: #eee;
+    color: #aaa;
+/*       pointer-events: none; */
+  }
+
+  .Button--disabled::before {
+    background-color: #eee;
+  }
+</style>
+
+<button type="submit" name="checkout" class="Cart__Checkout Button Button--primary Button--full" sytle="margin-top:10px;">
+          <span>{{ 'cart.general.checkout' | t }}</span>
+          <span class="Button__SeparatorDot"></span>
+          <span data-money-convertible>{{ cart.total_price | money_without_trailing_zeros }}</span>
+        </button>
+
+   
+        <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+
+<div class="Text--subdued" style="width:100%; text-align:center;margin-top:5px;">
+  
+  		{% assign taxCalculatedOld = cart.total_price | divided_by: 100.0 | times: 19.0 %}
+        {% assign amountWithoutTax = cart.total_price | divided_by: 1.19  %}
+        {% assign totalPrice = cart.total_price %}
+        {% assign taxAmount = totalPrice | minus: amountWithoutTax %}
+        	inkl. 19% MwSt. ({{ taxAmount | money_without_trailing_zeros }})
+        </div>
+        
+        
+        <button style="margin-bottom:1rem;" data-action="close-drawer" data-drawer-id="sidebar-cart" class="Button Button--secondary Button--full continue-shopping">{{ 'cart.general.cart_continue_shopping' | t }}</button>
+	        <div>
+        <p style="font-size:13px;display:none;">
+          * Bitte bestätigen Sie durch anklicken der Checkbox, dass Sie die Allgemeinen Geschäftsbedingungen, die Datenschutzerklärung und die Widerrufsbelehrung gelesen und mit deren Geltung einverstanden sind.
+        </p>
+        </div>
+        <style>
+          .continue-shopping {
+          margin-bottom:4rem;margin-top:1rem; color:#000;
+          }
+          .continue-shopping:hover {
+          color:#fff;
+          }
+        </style>
+        {%- if settings.cart_enable_notes -%}
+          <div class="Cart__OffscreenNoteContainer" aria-hidden="true">
+            {%- if cart.note == blank -%}
+              <span class="Cart__NoteButton">{{ 'cart.general.add_note' | t }}</span>
+            {%- else -%}
+              <span class="Cart__NoteButton">{{ 'cart.general.edit_note' | t }}</span>
+            {%- endif -%}
+
+            <div class="Form__Item">
+              <textarea class="Cart__Note Form__Textarea" name="note" id="cart-note" rows="3" placeholder="{{ 'cart.general.note_placeholder' | t }}" data-scrollable>{{ cart.note }}</textarea>
+            </div>
+
+            <button type="button" class="Button Button--primary Button--full" data-action="toggle-cart-note">{{ 'cart.general.save_note' | t }}</button>
+          </div>
+
+        {%- endif -%}
+      </div>
+    {%- endunless -%}
+  </form>
+</div>
+
